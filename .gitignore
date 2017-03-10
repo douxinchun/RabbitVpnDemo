@@ -1,0 +1,6 @@
+*.bcsymbolmap
+Carthage/Build/iOS/*.dSYM
+rabbit.xcodeproj/xcuserdata
+Carthage/Checkouts
+rabbit.xcodeproj/project.xcworkspace/xcuserdata
+Carthage
