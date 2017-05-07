@@ -26,7 +26,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
 	override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
         DDLog.removeAllLoggers()
-        DDLog.add(DDASLLogger.sharedInstance(), with: DDLogLevel.info)
+        DDLog.add(DDASLLogger.sharedInstance, with: DDLogLevel.info)
         ObserverFactory.currentFactory = DebugObserverFactory()
         NSLog("-------------")
         
@@ -46,7 +46,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let password = conf["ss_password"] as!String
                 
         // Proxy Adapter
-        let ssAdapterFactory = ShadowsocksAdapterFactory(serverHost: ss_adder, serverPort: ss_port, encryptAlgorithm: method, password: password)!
+        let ssAdapterFactory = ShadowsocksAdapterFactory(serverHost: ss_adder, serverPort: ss_port, protocolObfuscaterFactory: ShadowsocksAdapter.ProtocolObfuscater.HTTPProtocolObfuscater.Factory(hosts:["intl.aliyun.com","cdn.aliyun.com"], customHeader:nil), cryptorFactory: ShadowsocksAdapter.CryptoStreamProcessor.Factory(password: password, algorithm: .CHACHA20), streamObfuscaterFactory: ShadowsocksAdapter.StreamObfuscater.OriginStreamObfuscater.Factory())
+        
         let directAdapterFactory = DirectAdapterFactory()
         
         //Get lists from conf
@@ -89,10 +90,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 
                 
             case "iplist":
-                var ipArray = [String]()
-                for ip in each["criteria"].array!{
-                    ipArray.append(ip.string!)
-                }
+                let ipArray = each["criteria"].array!.map{$0.string!}
                 UserRules.append(try! IPRangeListRule(adapterFactory: adapter, ranges: ipArray))
             default:
                 break
@@ -158,14 +156,14 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         setTunnelNetworkSettings(networkSettings) {
             error in
             guard error == nil else {
-                DDLogError("Encountered an error setting up the network: \(error)")
+                DDLogError("Encountered an error setting up the network: \(error.debugDescription)")
                 completionHandler(error)
                 return
             }
             
             
             if !self.started{
-                self.proxyServer = GCDHTTPProxyServer(address: IPv4Address(fromString: "127.0.0.1"), port: NEKit.Port(port: UInt16(self.proxyPort)))
+                self.proxyServer = GCDHTTPProxyServer(address: IPAddress(fromString: "127.0.0.1"), port: NEKit.Port(port: UInt16(self.proxyPort)))
                 try! self.proxyServer.start()
                 self.addObserver(self, forKeyPath: "defaultPath", options: .initial, context: nil)
             }else{
@@ -183,19 +181,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 
                 self.interface = TUNInterface(packetFlow: self.packetFlow)
                 
-                let fakeIPPool = IPv4Pool(start: IPv4Address(fromString: "198.18.1.1")!, end: IPv4Address(fromString: "198.18.255.255")!)
-                let dnsServer = DNSServer(address: IPv4Address(fromString: "198.18.0.1")!, port: NEKit.Port(port: 53), fakeIPPool: fakeIPPool)
-                let resolver = UDPDNSResolver(address: IPv4Address(fromString: "114.114.114.114")!, port: NEKit.Port(port: 53))
+                
+                let fakeIPPool = try! IPPool(range: IPRange(startIP: IPAddress(fromString: "198.18.1.1")!, endIP: IPAddress(fromString: "198.18.255.255")!))
+                
+                
+                let dnsServer = DNSServer(address: IPAddress(fromString: "198.18.0.1")!, port: NEKit.Port(port: 53), fakeIPPool: fakeIPPool)
+                let resolver = UDPDNSResolver(address: IPAddress(fromString: "114.114.114.114")!, port: NEKit.Port(port: 53))
                 dnsServer.registerResolver(resolver)
-                self.interface.registerStack(dnsServer)
+                self.interface.register(stack: dnsServer)
+                
                 DNSServer.currentServer = dnsServer
                 
                 let udpStack = UDPDirectStack()
-                self.interface.registerStack(udpStack)
-                
+                self.interface.register(stack: udpStack)
                 let tcpStack = TCPStack.stack
                 tcpStack.proxyServer = self.proxyServer
-                self.interface.registerStack(tcpStack)
+                self.interface.register(stack:tcpStack)
                 self.interface.start()
             }
             self.started = true
