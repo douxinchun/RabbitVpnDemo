@@ -46,7 +46,31 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let password = conf["ss_password"] as!String
                 
         // Proxy Adapter
-        let ssAdapterFactory = ShadowsocksAdapterFactory(serverHost: ss_adder, serverPort: ss_port, protocolObfuscaterFactory: ShadowsocksAdapter.ProtocolObfuscater.HTTPProtocolObfuscater.Factory(hosts:["intl.aliyun.com","cdn.aliyun.com"], customHeader:nil), cryptorFactory: ShadowsocksAdapter.CryptoStreamProcessor.Factory(password: password, algorithm: .CHACHA20), streamObfuscaterFactory: ShadowsocksAdapter.StreamObfuscater.OriginStreamObfuscater.Factory())
+        
+        
+        // SSR Httpsimple
+//        let obfuscater = ShadowsocksAdapter.ProtocolObfuscater.HTTPProtocolObfuscater.Factory(hosts:["intl.aliyun.com","cdn.aliyun.com"], customHeader:nil)
+        
+        
+        // Origin
+        let obfuscater = ShadowsocksAdapter.ProtocolObfuscater.OriginProtocolObfuscater.Factory()
+        
+        
+        let algorithm:CryptoAlgorithm
+        
+        switch method{
+        case "AES128CFB":algorithm = .AES128CFB
+        case "AES192CFB":algorithm = .AES192CFB
+        case "AES256CFB":algorithm = .AES256CFB
+        case "CHACHA20":algorithm = .CHACHA20
+        case "SALSA20":algorithm = .RC4MD5
+        case "RC4MD5":algorithm = .SALSA20
+        default:
+            fatalError("Undefined algorithm!")
+        }
+        
+        
+        let ssAdapterFactory = ShadowsocksAdapterFactory(serverHost: ss_adder, serverPort: ss_port, protocolObfuscaterFactory:obfuscater, cryptorFactory: ShadowsocksAdapter.CryptoStreamProcessor.Factory(password: password, algorithm: algorithm), streamObfuscaterFactory: ShadowsocksAdapter.StreamObfuscater.OriginStreamObfuscater.Factory())
         
         let directAdapterFactory = DirectAdapterFactory()
         
