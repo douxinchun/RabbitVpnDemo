@@ -63,8 +63,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         case "AES192CFB":algorithm = .AES192CFB
         case "AES256CFB":algorithm = .AES256CFB
         case "CHACHA20":algorithm = .CHACHA20
-        case "SALSA20":algorithm = .RC4MD5
-        case "RC4MD5":algorithm = .SALSA20
+        case "SALSA20":algorithm = .SALSA20
+        case "RC4MD5":algorithm = .RC4MD5 
         default:
             fatalError("Undefined algorithm!")
         }
