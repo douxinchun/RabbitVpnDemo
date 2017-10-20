@@ -94,8 +94,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 var rule_array : [NEKit.DomainListRule.MatchCriterion] = []
                 for dom in each["criteria"].array!{
                     let raw_dom = dom.string!
-                    let index = raw_dom.characters.index(raw_dom.startIndex, offsetBy: 1)
-                    let index2 = raw_dom.characters.index(raw_dom.startIndex, offsetBy: 2)
+                    let index = raw_dom.index(raw_dom.startIndex, offsetBy: 1)
+                    let index2 = raw_dom.index(raw_dom.startIndex, offsetBy: 2)
                     let typeStr = raw_dom.substring(to: index)
                     let url = raw_dom.substring(from: index2)
                     
@@ -169,7 +169,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         proxySettings.exceptionList = ["api.smoot.apple.com","configuration.apple.com","xp.apple.com","smp-device-content.apple.com","guzzoni.apple.com","captive.apple.com","*.ess.apple.com","*.push.apple.com","*.push-apple.com.akadns.net"]
         networkSettings.proxySettings = proxySettings
         
-        // the 198.18.0.0/15 is reserved for benchmark.
         if enablePacketProcessing {
             let DNSSettings = NEDNSSettings(servers: ["198.18.0.1"])
             DNSSettings.matchDomains = [""]

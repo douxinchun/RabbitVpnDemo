@@ -16,7 +16,6 @@
 		09549ADC1DDF406B000F198C /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD21DDF406B000F198C /* CocoaAsyncSocket.framework */; };
 		09549ADD1DDF406B000F198C /* CocoaLumberjack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD31DDF406B000F198C /* CocoaLumberjack.framework */; };
 		09549ADE1DDF406B000F198C /* CocoaLumberjackSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD41DDF406B000F198C /* CocoaLumberjackSwift.framework */; };
-		09549ADF1DDF406B000F198C /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD51DDF406B000F198C /* CommonCrypto.framework */; };
 		09549AE01DDF406B000F198C /* lwip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD61DDF406B000F198C /* lwip.framework */; };
 		09549AE11DDF406B000F198C /* MMDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD71DDF406B000F198C /* MMDB.framework */; };
 		09549AE21DDF406B000F198C /* NEKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09549AD81DDF406B000F198C /* NEKit.framework */; };
@@ -106,7 +105,6 @@
 				09549ADC1DDF406B000F198C /* CocoaAsyncSocket.framework in Frameworks */,
 				09549ADD1DDF406B000F198C /* CocoaLumberjack.framework in Frameworks */,
 				09549ADE1DDF406B000F198C /* CocoaLumberjackSwift.framework in Frameworks */,
-				09549ADF1DDF406B000F198C /* CommonCrypto.framework in Frameworks */,
 				09549AE01DDF406B000F198C /* lwip.framework in Frameworks */,
 				09549AE11DDF406B000F198C /* MMDB.framework in Frameworks */,
 				09549AE21DDF406B000F198C /* NEKit.framework in Frameworks */,
@@ -257,6 +255,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 09549AC91DDF3B4A000F198C /* Build configuration list for PBXNativeTarget "PacketTunnel" */;
 			buildPhases = (
+				4A9CC1781F99970E006790C7 /* ShellScript */,
 				09549ABB1DDF3B49000F198C /* Sources */,
 				09549ABC1DDF3B49000F198C /* Frameworks */,
 				09549ABD1DDF3B49000F198C /* Resources */,
@@ -375,7 +374,6 @@
 				"$(SRCROOT)/Carthage/Build/iOS/CocoaAsyncSocket.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/CocoaLumberjack.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/CocoaLumberjackSwift.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/CommonCrypto.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/lwip.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/MMDB.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/NEKit.framework",
@@ -389,6 +387,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+		4A9CC1781F99970E006790C7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ ! -e $PROJECT_DIR/Frameworks/$PLATFORM_NAME ] ; then\necho Generating $PROJECT_DIR/Frameworks/$(PLATFORM_NAME)/CommonCrypto.framework\nxcrun -sdk macosx swift ./rabbit/GenerateCommonCryptoModule.swift $PLATFORM_NAME $PROJECT_DIR\nelse\necho Directory exists, skipping generation of $PROJECT_DIR/Frameworks/$(PLATFORM_NAME)/CommonCrypto.framework\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 

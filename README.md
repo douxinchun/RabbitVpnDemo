@@ -2,7 +2,7 @@
 a demo project for testing iOS network extension with NEkit
 - 一个使用NEKit的iOS App Demo
 
-Blog [初探iOS Network Extensio](http://www.jianshu.com/p/5ed93a8a1449)
+Blog [初探iOS Network Extension](http://www.jianshu.com/p/5ed93a8a1449)
 
 
 编译方法 
@@ -10,18 +10,8 @@ Blog [初探iOS Network Extensio](http://www.jianshu.com/p/5ed93a8a1449)
 carthage update --no-use-binaries --platform ios
 ```
 
-如果遇到
-```
-/Volumes/DOC/Codes/rabbitSwift2.3/Carthage/Checkouts/NEKit/src/Crypto/HMAC.swift:2:8: error: could not build Objective-C module 'CommonCrypto'
-```
-请根据log修改module.map中 sdk版本为相应Xcode模拟器版本。例如
 
-```
-  header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/usr/include/CommonCrypto//CommonCrypto.h"
-  header "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/usr/include/CommonCrypto//CommonRandom.h"
-```
-
-如果您受本文启发写了app甚至上架了Appstore，告诉我一声好吗？
+如果您受本文启发写了app甚至上架了Appstore，PLZ TELL ME.
 
 # 赞助
 - 支付宝
@@ -49,3 +39,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
