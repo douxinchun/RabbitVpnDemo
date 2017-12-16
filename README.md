@@ -10,6 +10,8 @@ Blog [初探iOS Network Extension](http://www.jianshu.com/p/5ed93a8a1449)
 carthage update --no-use-binaries --platform ios
 ```
 
+PS 如果遇到连接失败等问题，建议切分支到BasicTest（单纯建立vpn连接不引入nekit）验证是否能建立连接。
+同时本工程需要99刀的开发者账号
 
 如果您受本文启发写了app甚至上架了Appstore，PLZ TELL ME.
 
