@@ -13,6 +13,8 @@ carthage update --no-use-binaries --platform ios
 PS 如果遇到连接失败等问题，建议切分支到BasicTest（单纯建立vpn连接不引入nekit）验证是否能建立连接。
 同时本工程需要99刀的开发者账号
 
+遇到点击connect后没有反应（extension 运行崩溃）可以在Xcode - Devices 中拉取并检查设备崩溃日志来定位问题。
+
 如果您受本文启发写了app甚至上架了Appstore，PLZ TELL ME.
 
 # 赞助
