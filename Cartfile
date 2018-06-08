@@ -1,1 +1,2 @@
+github "soffes/CommonCrypto"
 git "https://github.com/zhuhaow/NEKit" "master"

@@ -17,10 +17,7 @@ PS 如果遇到连接失败等问题，建议切分支到BasicTest（单纯建�
 
 如果您受本文启发写了app甚至上架了Appstore，PLZ TELL ME.
 
-# 赞助
-- 支付宝
 
-  ![](http://ww4.sinaimg.cn/large/006tNc79gy1ffd90knw0bj304q04kwet.jpg)
 # License
 MIT License
 
