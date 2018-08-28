@@ -8,7 +8,7 @@
 	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.w2fzu.rabbit</string>
+		<string>group.com.w2fzu.rabbitfork</string>
 	</array>
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>

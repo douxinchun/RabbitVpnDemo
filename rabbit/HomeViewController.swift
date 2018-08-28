@@ -63,6 +63,7 @@ class HomeViewController: UIViewController {
     
     @IBAction func connectTap(_ sender: AnyObject) {
         print("connect tap")
+        
         if(VpnManager.shared.vpnStatus == .off){
             VpnManager.shared.connect()
         }else{

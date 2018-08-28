@@ -47,7 +47,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 
         // Proxy Adapter
         
-        
         // SSR Httpsimple
 //        let obfuscater = ShadowsocksAdapter.ProtocolObfuscater.HTTPProtocolObfuscater.Factory(hosts:["intl.aliyun.com","cdn.aliyun.com"], customHeader:nil)
         
