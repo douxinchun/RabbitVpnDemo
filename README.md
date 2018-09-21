@@ -2,7 +2,11 @@
 a demo project for testing iOS network extension with NEkit
 - 一个使用NEKit的iOS App Demo
 
-Blog [初探iOS Network Extension](http://www.jianshu.com/p/5ed93a8a1449)
+在https://github.com/yichengchen/RabbitVpnDemo 的基础上做出如下修改:
+
+1. NEKit 直接引入了源码,便于跟踪学习
+
+2. 在Xcode10 Swift4.2 上编译通过
 
 
 编译方法 
@@ -10,12 +14,22 @@ Blog [初探iOS Network Extension](http://www.jianshu.com/p/5ed93a8a1449)
 carthage update --no-use-binaries --platform ios
 ```
 
-PS 如果遇到连接失败等问题，建议切分支到BasicTest（单纯建立vpn连接不引入nekit）验证是否能建立连接。
+建立连接前的配置,
+
+VpnManager.swift 中的 VpnManager 下的setRulerConfig,依次配置自己的SOCK5 Server的信息:
+
+```swift
+conf["ss_address"] = "xx.xx.xx.xx" as AnyObject?
+conf["ss_port"] = 10086 as AnyObject?
+conf["ss_method"] = "AES256CFB" as AnyObject? // 大写 没有横杠 看Extension中的枚举类设定 否则引发fatal error
+conf["ss_password"] = "your_password" as AnyObject?
+```
+
+
+
 同时本工程需要99刀的开发者账号
 
 遇到点击connect后没有反应（extension 运行崩溃）可以在Xcode - Devices 中拉取并检查设备崩溃日志来定位问题。
-
-如果您受本文启发写了app甚至上架了Appstore，PLZ TELL ME.
 
 
 # License

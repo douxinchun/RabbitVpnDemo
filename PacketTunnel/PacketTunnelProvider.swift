@@ -7,14 +7,13 @@
 //
 
 import NetworkExtension
-import NEKit
 import CocoaLumberjackSwift
 import Yaml
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     
     var interface: TUNInterface!
-    var enablePacketProcessing = false
+    var enablePacketProcessing = true
     
     var proxyPort: Int!
     
@@ -34,26 +33,18 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             NSLog("[ERROR] No ProtocolConfiguration Found")
             exit(EXIT_FAILURE)
         }
-        
-        
         let ss_adder = conf["ss_address"] as! String
         NSLog(ss_adder)
         
         let ss_port = conf["ss_port"] as! Int
         let method = conf["ss_method"] as! String
         NSLog(method)
-
         let password = conf["ss_password"] as!String
-                
         // Proxy Adapter
-        
         // SSR Httpsimple
 //        let obfuscater = ShadowsocksAdapter.ProtocolObfuscater.HTTPProtocolObfuscater.Factory(hosts:["intl.aliyun.com","cdn.aliyun.com"], customHeader:nil)
-        
-        
         // Origin
         let obfuscater = ShadowsocksAdapter.ProtocolObfuscater.OriginProtocolObfuscater.Factory()
-        
         
         let algorithm:CryptoAlgorithm
         
@@ -68,7 +59,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             fatalError("Undefined algorithm!")
         }
         
-        
         let ssAdapterFactory = ShadowsocksAdapterFactory(serverHost: ss_adder, serverPort: ss_port, protocolObfuscaterFactory:obfuscater, cryptorFactory: ShadowsocksAdapter.CryptoStreamProcessor.Factory(password: password, algorithm: algorithm), streamObfuscaterFactory: ShadowsocksAdapter.StreamObfuscater.OriginStreamObfuscater.Factory())
         
         let directAdapterFactory = DirectAdapterFactory()
@@ -77,33 +67,35 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let yaml_str = conf["ymal_conf"] as!String
         let value = try! Yaml.load(yaml_str)
         
-        var UserRules:[NEKit.Rule] = []
+        var UserRules:[Rule] = []
         
         for each in (value["rule"].array! ){
-            let adapter:NEKit.AdapterFactory
+            let adapter:AdapterFactory
             if each["adapter"].string! == "direct"{
-                adapter = directAdapterFactory
+                adapter = directAdapterFactory as AdapterFactory
             }else{
-                adapter = ssAdapterFactory
+                adapter = ssAdapterFactory as AdapterFactory
             }
             
             let ruleType = each["type"].string!
             switch ruleType {
             case "domainlist":
-                var rule_array : [NEKit.DomainListRule.MatchCriterion] = []
+                var rule_array : [DomainListRule.MatchCriterion] = []
                 for dom in each["criteria"].array!{
                     let raw_dom = dom.string!
                     let index = raw_dom.index(raw_dom.startIndex, offsetBy: 1)
                     let index2 = raw_dom.index(raw_dom.startIndex, offsetBy: 2)
-                    let typeStr = raw_dom.substring(to: index)
-                    let url = raw_dom.substring(from: index2)
+                    let typeStr = raw_dom.prefix(upTo: index)
+                        //raw_dom.substring(to: index)
+                    let url = raw_dom.suffix(from: index2)
+                        //raw_dom.substring(from: index2)
                     
                     if typeStr == "s"{
-                        rule_array.append(DomainListRule.MatchCriterion.suffix(url))
+                        rule_array.append(DomainListRule.MatchCriterion.suffix(String(url)))
                     }else if typeStr == "k"{
-                        rule_array.append(DomainListRule.MatchCriterion.keyword(url))
+                        rule_array.append(DomainListRule.MatchCriterion.keyword(String(url)))
                     }else if typeStr == "p"{
-                        rule_array.append(DomainListRule.MatchCriterion.prefix(url))
+                        rule_array.append(DomainListRule.MatchCriterion.prefix(String(url)))
                     }else if typeStr == "r"{
                         // ToDo:
                         // shoud be complete
@@ -126,8 +118,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         let chinaRule = CountryRule(countryCode: "CN", match: true, adapterFactory: directAdapterFactory)
         let unKnowLoc = CountryRule(countryCode: "--", match: true, adapterFactory: directAdapterFactory)
         let dnsFailRule = DNSFailRule(adapterFactory: ssAdapterFactory)
-     
         let allRule = AllRule(adapterFactory: ssAdapterFactory)
+        
         UserRules.append(contentsOf: [chinaRule,unKnowLoc,dnsFailRule,allRule])
         
         let manager = RuleManager(fromRules: UserRules, appendDirect: true)
@@ -135,7 +127,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         RuleManager.currentManager = manager
         proxyPort =  9090
 
-//        RawSocketFactory.TunnelProvider = self
+        RawSocketFactory.TunnelProvider = self
         
         // the `tunnelRemoteAddress` is meaningless because we are not creating a tunnel.
         let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "8.8.8.8")
@@ -155,7 +147,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
             ]
         }
-        networkSettings.iPv4Settings = ipv4Settings
+        networkSettings.ipv4Settings = ipv4Settings
         
         let proxySettings = NEProxySettings()
         proxySettings.httpEnabled = true
@@ -169,7 +161,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
         networkSettings.proxySettings = proxySettings
         
         if enablePacketProcessing {
-            let DNSSettings = NEDNSSettings(servers: ["198.18.0.1"])
+            let DNSSettings = NEDNSSettings(servers: ["172.16.0.1"])
             DNSSettings.matchDomains = [""]
             DNSSettings.matchDomainsNoSearch = false
             networkSettings.dnsSettings = DNSSettings
@@ -185,7 +177,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             
             
             if !self.started{
-                self.proxyServer = GCDHTTPProxyServer(address: IPAddress(fromString: "127.0.0.1"), port: NEKit.Port(port: UInt16(self.proxyPort)))
+                self.proxyServer = GCDHTTPProxyServer(address: IPAddress(fromString: "127.0.0.1"), port: Port(port: UInt16(self.proxyPort)))
                 try! self.proxyServer.start()
                 self.addObserver(self, forKeyPath: "defaultPath", options: .initial, context: nil)
             }else{
@@ -195,25 +187,23 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             
             completionHandler(nil)
             
-            
+            NSLog("-------- before enablePacketProcessing ----------")
             if self.enablePacketProcessing {
+                NSLog("-------- enablePacketProcessing ----------")
                 if self.started{
-                    self.interface.stop()
+                    //self.interface.stop()
                 }
-                
                 self.interface = TUNInterface(packetFlow: self.packetFlow)
                 
+               // RawSocketFactory.TunnelProvider = self
                 
                 let fakeIPPool = try! IPPool(range: IPRange(startIP: IPAddress(fromString: "198.18.1.1")!, endIP: IPAddress(fromString: "198.18.255.255")!))
-                
-                
-                let dnsServer = DNSServer(address: IPAddress(fromString: "198.18.0.1")!, port: NEKit.Port(port: 53), fakeIPPool: fakeIPPool)
-                let resolver = UDPDNSResolver(address: IPAddress(fromString: "114.114.114.114")!, port: NEKit.Port(port: 53))
+                let dnsServer = DNSServer(address: IPAddress(fromString: "172.16.0.1")!, port: Port(port: 53), fakeIPPool: fakeIPPool)
+                let resolver = UDPDNSResolver(address: IPAddress(fromString: "223.5.5.5")!, port: Port(port: 53))
                 dnsServer.registerResolver(resolver)
+               
                 self.interface.register(stack: dnsServer)
-                
                 DNSServer.currentServer = dnsServer
-                
                 let udpStack = UDPDirectStack()
                 self.interface.register(stack: udpStack)
                 let tcpStack = TCPStack.stack
@@ -222,7 +212,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 self.interface.start()
             }
             self.started = true
-
+            
         }
         
     }
@@ -246,22 +236,22 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 	}
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "defaultPath" {
-            if self.defaultPath?.status == .satisfied && self.defaultPath != lastPath{
-                if(lastPath == nil){
-                    lastPath = self.defaultPath
-                }else{
-                    NSLog("received network change notifcation")
-                    let delayTime = DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
-                    DispatchQueue.main.asyncAfter(deadline: delayTime) {
-                        self.startTunnel(options: nil){_ in}
-                    }
-                }
-            }else{
-                lastPath = defaultPath
-            }
-        }
-        
+//        if keyPath == "defaultPath" {
+//            if self.defaultPath?.status == .satisfied && self.defaultPath != lastPath{
+//                if(lastPath == nil){
+//                    lastPath = self.defaultPath
+//                }else{
+//                    NSLog("DNSServer received network change notifcation")
+//                    let delayTime = DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+//                    DispatchQueue.main.asyncAfter(deadline: delayTime) {
+//                        self.startTunnel(options: nil){_ in}
+//                    }
+//                }
+//            }else{
+//                lastPath = defaultPath
+//            }
+//        }
     }
+ 
 
 }

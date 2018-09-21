@@ -33,6 +33,10 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let request = URLRequest(url:URL(string: "http://www.sohu.com")!)
+        let session = URLSession.shared
+        let task = session.dataTask(with: request)
+        task.resume()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -40,7 +44,7 @@ class HomeViewController: UIViewController {
         self.status = VpnManager.shared.vpnStatus
     }
     
-    func onVPNStatusChanged(){
+    @objc func onVPNStatusChanged(){
         self.status = VpnManager.shared.vpnStatus
     }
     
