@@ -7,6 +7,7 @@ a demo project for testing iOS network extension with NEkit
 1. NEKit 直接引入了源码,便于跟踪学习
 
 2. 在Xcode10 Swift4.2 上编译通过
+3. 准备增加Server UI 配置界面
 
 
 编译方法 
@@ -26,8 +27,6 @@ conf["ss_password"] = "your_password" as AnyObject?
 ```
 
 
-
-同时本工程需要99刀的开发者账号
 
 遇到点击connect后没有反应（extension 运行崩溃）可以在Xcode - Devices 中拉取并检查设备崩溃日志来定位问题。
 
